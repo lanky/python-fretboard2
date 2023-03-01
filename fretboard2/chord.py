@@ -1,24 +1,37 @@
 import copy
 
 import attrdict
-import svgwrite
 import yaml
 
+from . import fretboard
 from .compat import StringIO
-from .fretboard import Fretboard
 from .utils import dict_merge
 
-CHORD_STYLE = """
-string:
-    muted_font_color: silver
-    open_font_color: steelblue
-"""
+with open("../config.yml", "r") as config:
+    config_dict = yaml.load(config)
+    CHORD_STYLE = config_dict["chord"]
+    FRETBOARD_STYLE = config_dict["fretboard"]
 
 
 class Chord(object):
-    default_style = dict_merge(yaml.safe_load(CHORD_STYLE), Fretboard.default_style)
-    inlays = Fretboard.inlays
-    strings = 6
+    """
+    Create a chord diagram.
+
+    positions = string of finger positions, e.g. guitar D = 'xx0232'. If frets
+    go above 9, use hyphens to separate all strings, e.g. 'x-x-0-14-15-14'.
+
+    fingers = string of finger labels, e.g. 'T--132' for guitar D/F# '2x0232'.
+
+    barre = int specifying a fret to be completely barred. Minimal barres are
+    automatically inserted, so this should be used when you want to override
+    this behaviour.
+    """
+
+    default_style = dict_merge(
+        yaml.safe_load(CHORD_STYLE), fretboard.Fretboard.default_style
+    )
+    inlays = None
+    strings = None
 
     def __init__(self, positions=None, fingers=None, style=None):
         if positions is None:
@@ -35,10 +48,7 @@ class Chord(object):
             dict_merge(copy.deepcopy(self.default_style), style or {})
         )
 
-    def get_barre_fret(self):
-        for index, finger in enumerate(self.fingers):
-            if finger.isdigit() and self.fingers.count(finger) > 1:
-                return int(self.positions[index])
+        self.fretboard = None
 
     def get_fret_range(self):
         fretted_positions = list(
@@ -51,7 +61,7 @@ class Chord(object):
         return (first_fret, first_fret + 4)
 
     def draw(self):
-        self.fretboard = Fretboard(
+        self.fretboard = self.fretboard_cls(
             strings=self.strings,
             frets=self.get_fret_range(),
             inlays=self.inlays,
@@ -125,10 +135,19 @@ class Chord(object):
             self.render(output)
 
 
+class GuitarChord(Chord):
+    @property
+    def fretboard_cls(self):
+        return fretboard.GuitarFretboard
+
+
 class BassChord(Chord):
-    strings = 4
+    @property
+    def fretboard_cls(self):
+        return fretboard.BassFretboard
 
 
 class UkuleleChord(Chord):
-    strings = 4
-    inlays = (3, 5, 7, 10)
+    @property
+    def fretboard_cls(self):
+        return fretboard.UkuleleFretboard
