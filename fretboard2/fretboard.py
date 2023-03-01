@@ -79,6 +79,8 @@ class Fretboard(object):
             dict_merge(copy.deepcopy(self.default_style), style or {})
         )
 
+        self.drawing = None
+
     def add_string_label(self, string, label, font_color=None):
         self.strings[string].label = label
         self.strings[string].font_color = font_color
@@ -94,6 +96,13 @@ class Fretboard(object):
                     "font_color": font_color,
                 }
             )
+        )
+
+    def add_barre(self, fret, strings, finger):
+        self.add_marker(
+            string=(strings[0], strings[1]),
+            fret=fret,
+            label=finger,
         )
 
     def calculate_layout(self):
@@ -513,3 +522,18 @@ class Fretboard(object):
     def save(self, filename):
         with open(filename, "w") as output:
             self.render(output)
+
+
+class GuitarFretboard(Fretboard):
+    string_count = 6
+    inlays = (3, 5, 7, 9)
+
+
+class BassFretboard(Fretboard):
+    string_count = 4
+    inlays = (3, 5, 7, 9)
+
+
+class UkuleleFretboard(Fretboard):
+    string_count = 4
+    inlays = (3, 5, 7, 10)
