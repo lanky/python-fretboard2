@@ -33,7 +33,7 @@ class Chord(object):
     inlays = None
     strings = None
 
-    def __init__(self, positions=None, fingers=None, style=None):
+    def __init__(self, positions=None, fingers=None, barre=None, style=None):
         if positions is None:
             positions = []
         elif "-" in positions:
@@ -44,11 +44,17 @@ class Chord(object):
 
         self.fingers = list(fingers) if fingers else []
 
+        self.barre = barre
+
         self.style = attrdict.AttrDict(
             dict_merge(copy.deepcopy(self.default_style), style or {})
         )
 
         self.fretboard = None
+
+    @property
+    def fretboard_cls(self):
+        raise NotImplementedError
 
     def get_fret_range(self):
         fretted_positions = list(
@@ -69,20 +75,27 @@ class Chord(object):
         )
 
         # Check for a barred fret (we'll need to know this later)
-        barre_fret = None
-        for index, finger in enumerate(self.fingers):
-            if finger.isdigit() and self.fingers.count(finger) > 1:
-                barre_fret = self.positions[index]
-                barre_start = index
-                barre_end = len(self.fingers) - self.fingers[::-1].index(finger) - 1
-                break
-
-        if barre_fret is not None:
-            self.fretboard.add_marker(
-                string=(barre_start, barre_end),
-                fret=barre_fret,
-                label=finger,
+        if self.barre is not None:
+            # when barre is overridden, barre all strings.
+            self.fretboard.add_barre(
+                fret=self.barre,
+                strings=(0, self.fretboard.string_count - 1),
+                finger=self.fingers[self.positions.index(self.barre)],
             )
+        else:
+            # Otherwise check for a barred fret
+            for index, finger in enumerate(self.fingers):
+                if finger.isdigit() and self.fingers.count(finger) > 1:
+                    self.barre = self.positions[index]
+                    self.fretboard.add_barre(
+                        fret=self.barre,
+                        strings=(
+                            index,
+                            len(self.fingers) - self.fingers[::-1].index(finger) - 1,
+                        ),
+                        finger=finger,
+                    )
+                    break
 
         for string in range(self.strings):
             # Get the position and fingering
@@ -108,7 +121,7 @@ class Chord(object):
                     if is_muted
                     else self.style.string.open_font_color,
                 )
-            elif fret is not None and fret != barre_fret:
+            elif fret is not None and fret != self.barre:
                 # Add the fret marker
                 try:
                     finger = self.fingers[string]
