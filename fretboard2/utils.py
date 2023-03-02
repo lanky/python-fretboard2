@@ -1,4 +1,7 @@
-import collections
+try:
+    from collections import Mapping
+except ImportError:
+    from collections.abc import Mapping
 
 
 # https://gist.github.com/angstwad/bf22d1822c38a92ec0a9
@@ -12,11 +15,7 @@ def dict_merge(dct, merge_dct):
     :return: None
     """
     for k, v in merge_dct.items():
-        if (
-            k in dct
-            and isinstance(dct[k], dict)
-            and isinstance(merge_dct[k], collections.Mapping)
-        ):
+        if k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], Mapping):
             dict_merge(dct[k], merge_dct[k])
         else:
             dct[k] = merge_dct[k]
