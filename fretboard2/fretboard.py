@@ -2,55 +2,18 @@ import copy
 
 import attrdict
 import svgwrite
-import yaml
-
-from .compat import StringIO
-from .utils import dict_merge
 
 # fretboard = Fretboard(strings=6, frets=(3, 8))
 # fretboard.add_string_label(string=1, label='X', color='')
 # fretboard.add_barre(fret=1, strings=(0, 5), label='')
 # fretboard.add_marker(fret=1, string=1, label='', color='')
-
-DEFAULT_STYLE = """
-drawing:
-    background_color: white
-    font_color: dimgray
-    font_family: Lato
-    font_size: 15
-    height: 300
-    width: 250
-    spacing: 30
-    orientation: portrait
-
-nut:
-    color: darkslategray
-    size: 10
-
-fret:
-    color: darkgray
-    size: 2
-
-inlays:
-    color: black
-    radius: 2
-
-string:
-    color: darkslategray
-    size: 3
-
-marker:
-    border_color: darkslategray
-    color: steelblue
-    font_color: white
-    radius: 12
-    stroke_width: 2
-
-"""
+from ._defaults import DEFAULTS
+from .compat import StringIO
+from .utils import dict_merge
 
 
 class Fretboard(object):
-    default_style = yaml.safe_load(DEFAULT_STYLE)
+    default_style = DEFAULTS
 
     # Guitars and basses have different inlay patterns than, e.g., ukulele
     # A double inlay will be added at the octave (12th fret)
