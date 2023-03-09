@@ -15,11 +15,7 @@ from .utils import dict_merge
 class Fretboard(object):
     default_style = DEFAULTS
 
-    # Guitars and basses have different inlay patterns than, e.g., ukulele
-    # A double inlay will be added at the octave (12th fret)
-    inlays = (3, 5, 7, 9)
-
-    def __init__(self, strings=6, frets=(0, 5), inlays=None, style=None):
+    def __init__(self, strings=None, frets=(0, 5), inlays=None, title=None, style=None):
         self.frets = list(range(max(frets[0] - 1, 0), frets[1] + 1))
         self.strings = [
             attrdict.AttrDict(
@@ -29,18 +25,22 @@ class Fretboard(object):
                     "font_color": None,
                 }
             )
-            for x in range(strings)
+            for x in range(self.string_count)
         ]
 
         self.markers = []
 
-        self.inlays = inlays if inlays is not None else self.inlays
+        # Guitars and basses have different inlay patterns than, e.g., ukulele
+        # A double inlay will be added at the 12th/24th/... fret regardless.
+        self.inlays = inlays or self.inlays
 
         self.layout = attrdict.AttrDict()
 
         self.style = attrdict.AttrDict(
             dict_merge(copy.deepcopy(self.default_style), style or {})
         )
+
+        self.title = title
 
         self.drawing = None
 
@@ -445,6 +445,23 @@ class Fretboard(object):
                 )
             )
 
+    def draw_title(self):
+        if self.title is not None:
+            x = self.layout.width / 2 + self.style.drawing.spacing
+            y = self.layout.y - self.style.drawing.spacing
+            self.drawing.add(
+                self.drawing.text(
+                    self.title,
+                    insert=(x, y),
+                    font_family=self.style.drawing.font_family,
+                    font_size=self.style.drawing.font_size,
+                    font_weight="bold",
+                    fill=self.style.drawing.font_color,
+                    text_anchor="middle",
+                    alignment_baseline="central",
+                )
+            )
+
     def draw(self):
         self.drawing = svgwrite.Drawing(
             size=(
@@ -472,6 +489,7 @@ class Fretboard(object):
         self.draw_strings()
         self.draw_nut()
         self.draw_markers()
+        self.draw_title()
 
     def render(self, output=None):
         self.draw()

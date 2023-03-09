@@ -29,10 +29,13 @@ class Chord(object):
     strings = None
     default_style = dict_merge(DEFAULTS, CHORD)
 
-    def __init__(self, positions=None, fingers=None, barre=None, style=None):
+    def __init__(
+        self, positions=None, fingers=None, barre=None, title=None, style=None
+    ):
         if positions is None:
             positions = []
         elif "-" in positions:
+            # use - to separate numbers when frets go above 9, e.g., x-x-0-10-10-10
             positions = positions.split("-")
         else:
             positions = list(positions)
@@ -45,6 +48,10 @@ class Chord(object):
         self.style = attrdict.AttrDict(
             dict_merge(copy.deepcopy(self.default_style), style or {})
         )
+
+        self.title = title
+
+        self.strings = self.fretboard_cls.string_count
 
         self.fretboard = None
 
@@ -67,6 +74,7 @@ class Chord(object):
             strings=self.strings,
             frets=self.get_fret_range(),
             inlays=self.inlays,
+            title=self.title,
             style=self.style,
         )
 
