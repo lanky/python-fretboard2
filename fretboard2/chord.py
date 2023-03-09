@@ -4,13 +4,11 @@ import attrdict
 import yaml
 
 from . import fretboard
+
+# from .config import settings
+from ._defaults import CHORD, DEFAULTS
 from .compat import StringIO
 from .utils import dict_merge
-
-with open("../config.yml", "r") as config:
-    config_dict = yaml.load(config)
-    CHORD_STYLE = config_dict["chord"]
-    FRETBOARD_STYLE = config_dict["fretboard"]
 
 
 class Chord(object):
@@ -27,11 +25,9 @@ class Chord(object):
     this behaviour.
     """
 
-    default_style = dict_merge(
-        yaml.safe_load(CHORD_STYLE), fretboard.Fretboard.default_style
-    )
     inlays = None
     strings = None
+    default_style = dict_merge(DEFAULTS, CHORD)
 
     def __init__(self, positions=None, fingers=None, barre=None, style=None):
         if positions is None:
