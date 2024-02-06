@@ -5,28 +5,31 @@ description = "A Python library for generating SVG Fretboard images and chord di
 authors = [
     "Derek Payton <derek.payton@gmail.com>",
     "Robin Brown <@birdcolour>",
-    "Stuart Sears <stuart@sjsears.com>"
+    "Stuart Sears <stuart@sjsears.com>",
 ]
 license = "MIT"
 repository = "https://github.com/lanky/python-fretboard2"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-PyYAML = "^6.0"
+PyYAML = "^6.0.1"
 svgwrite = "^1.4.3"
-attrdict = "^2.0.1"
+attrdict3 = "^2.0.2"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.test.dependencies]
 pytest = "^7.2.1"
-pre-commit = "^3.1.1"
-# for manual code formatting, although pre-commit will help
-black = "^23.1.0"
-isort = "^5.12.0"
-flake8 = "^6.0.0"
-# used for the demo
-invoke = "^2.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.6.0"
+black = "^24.1.1"
+isort = "^5.13.2"
+flake8 = "^7.0.0"
+pip-tools = "^7.3.0"
+
+
+[tool.poetry.group.demo.dependencies]
+invoke = "^2.2.0"
 livereload = "^2.6.3"
-pip-tools = "^6.12.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -44,7 +47,7 @@ reportGeneralTypeIssues = false
 [tool.black]
 # project-specific black setup
 line-length = 88
-target-version = ['py38', 'py39', 'py310']
+target-version = ['py39', 'py310', 'py311', 'py312']
 include = '\.pyi?$'
 exclude = '/(\.git|_build|build|dist|\.tox|\.venv)/'
 
