@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# project-specific
+# demo output files
+demo/svg/
+
 # Distribution / packaging
 .Python
 env/
