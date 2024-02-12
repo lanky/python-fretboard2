@@ -24,7 +24,7 @@ def clean(ctx):
 @invoke.task
 def build(ctx):
     # Chord (D)
-    chord = GuitarChord(positions="xx0232", fingers="---132", title="D")
+    chord = GuitarChord(positions="xx0232", fingers="---132", title="D Major Chord")
     chord.save("svg/D.svg")
 
     # Barre chord (F#)
@@ -38,6 +38,10 @@ def build(ctx):
     # Ukulele chord (G)
     chord = UkuleleChord(positions="x232", fingers="-132", title="G")
     chord.save("svg/ukulele-G.svg")
+
+    # Ukulele chord (G)
+    chord = UkuleleChord(positions="x232", fingers="-132")
+    chord.save("svg/ukulele-G-no-title.svg")
 
     # Bass chord (E)
     chord = BassChord(positions="x221", fingers="-321", title="E")
