@@ -28,11 +28,11 @@ def build(ctx):
     chord.save("svg/D.svg")
 
     # Barre chord (F#)
-    chord = GuitarChord(positions="133211", fingers="134211", title="F#")
-    chord.save("svg/F-sharp.svg")
+    chord = GuitarChord(positions="133211", fingers="134211", title="F")
+    chord.save("svg/F-barre.svg")
 
     # C shape, higher up the neck
-    chord = GuitarChord(positions="x-15-14-11-12-11", fingers="-43121", title="C")
+    chord = GuitarChord(positions="x-15-14-12-13-12", fingers="-43121", title="C")
     chord.save("svg/C-shape.svg")
 
     # Ukulele chord (G)
@@ -49,7 +49,7 @@ def build(ctx):
 
     # Fretboard w/ Rocksmith-style string colors (F#)
     fb = GuitarFretboard(
-        title="F#",
+        title="F",
         style={
             "drawing": {"background_color": "black"},
             "fret": {"color": "darkslategray"},
@@ -70,7 +70,29 @@ def build(ctx):
     fb.strings[4].color = "limegreen"
     fb.strings[5].color = "magenta"
 
-    fb.save("svg/F-sharp-rocksmith.svg")
+    fb.save("svg/F-barre-rocksmith.svg")
+
+    # Pentatonic scale shape w/ highlighted root notes
+    fb = GuitarFretboard(
+        frets=(5, 8),
+        style={
+            "marker": {"color": "cornflowerblue"},
+        },
+    )
+    fb.add_marker(string=0, fret=5, label="A", color="salmon")
+    fb.add_marker(string=1, fret=5, label="D")
+    fb.add_marker(string=2, fret=5, label="G")
+    fb.add_marker(string=3, fret=5, label="C")
+    fb.add_marker(string=4, fret=5, label="E")
+    fb.add_marker(string=5, fret=5, label="A", color="salmon")
+
+    fb.add_marker(string=0, fret=8, label="C")
+    fb.add_marker(string=1, fret=7, label="E")
+    fb.add_marker(string=2, fret=7, label="A", color="salmon")
+    fb.add_marker(string=3, fret=7, label="D")
+    fb.add_marker(string=4, fret=8, label="G")
+    fb.add_marker(string=5, fret=8, label="C")
+    fb.save("svg/pentatonic-shape.svg")
 
     # Pentatonic scale shape w/ highlighted root notes
     fb = GuitarFretboard(
@@ -93,7 +115,19 @@ def build(ctx):
     fb.add_marker(string=3, fret=7, label="D")
     fb.add_marker(string=4, fret=8, label="G")
     fb.add_marker(string=5, fret=8, label="C")
-    fb.save("svg/pentatonic-shape.svg")
+    fb.save("svg/pentatonic-landscape.svg")
+
+    chord = GuitarChord(
+        positions="320003",
+        fingers="12---3",
+        title="G Major",
+        style={
+            "drawing": {
+                "orientation": "landscape",
+            }
+        },
+    )
+    chord.save("svg/G-Major-Landscape.svg")
 
 
 @invoke.task(pre=[clean, build])
