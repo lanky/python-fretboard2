@@ -171,9 +171,11 @@ class Fretboard(object):
             else:
                 if self.style.drawing.orientation == "portrait":
                     top = self.layout.y + self.style.nut.size
-                    fret_y = top + (self.layout.fret_space * index)
-                    start = (self.layout.x, fret_y)
-                    end = (self.layout.x + self.layout.width, fret_y)
+                    start = (self.layout.x, top + (self.layout.fret_space * index))
+                    end = (
+                        self.layout.x + self.layout.width,
+                        top + (self.layout.fret_space * index),
+                    )
                 else:
                     left = self.layout.x + self.style.nut.size
                     fret_x = left + (self.layout.fret_space * index)
