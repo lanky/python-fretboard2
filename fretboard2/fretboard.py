@@ -192,10 +192,33 @@ class Fretboard(object):
                 )
 
     def draw_strings(self):
+        """
+        Draw lines to represent strings
+        """
+        if self.style.drawing.orientation == "portrait":
+            # vertical strings, y is a constant
+            start = self.layout.y
+            end = start + self.layout.height
+            label_y = (
+                self.layout.y
+                - self.style.drawing.spacing
+                + self.style.drawing.font_size / 2
+            )
+        else:
+            # horizontal strings, x is a constant
+            start = self.layout.x
+            end = start + self.layout.width
+            # x coordinate for string labels
+            label_x = (
+                self.layout.x
+                + self.style.drawing.font_size / 2
+                - self.style.drawing.spacing
+            )
+
         for index, string in enumerate(self.strings):
             # Offset the first and last strings, so they're not drawn outside the edge of the nut.
             string_width = self.style.string.size - (
-                (self.style.string.size * 1 / (len(self.strings) * 1.5)) * index
+                (self.style.string.size / (len(self.strings) * 1.5)) * index
             )
             offset = 0
             str_index = self.get_layout_string_index(index)
@@ -206,28 +229,21 @@ class Fretboard(object):
                 offset -= string_width / 2.0
 
             if self.style.drawing.orientation == "portrait":
+
+                # horizontal position of str and its label
                 label_x = (
                     self.layout.x + (self.layout.string_space * str_index) + offset
                 )
-                label_y = (
-                    self.layout.y
-                    + self.style.drawing.font_size
-                    - self.style.drawing.spacing
-                )
-                string_start = (label_x, self.layout.y)
-                string_stop = (label_x, self.layout.y + self.layout.height)
+                string_start = (label_x, start)
+                string_stop = (label_x, end)
 
             elif self.style.drawing.orientation == "landscape":
-                label_x = (
-                    self.layout.x
-                    + self.style.drawing.font_size
-                    - self.style.drawing.spacing
-                )
+                # strings go left to right, so only the ex coordinate changes
                 label_y = (
                     self.layout.y + (self.layout.string_space * str_index) + offset
                 )
-                string_start = (self.layout.x, label_y)
-                string_stop = (self.layout.x + self.layout.width, label_y)
+                string_start = (start, label_y)
+                string_stop = (end, label_y)
 
             self.drawing.add(
                 self.drawing.line(
