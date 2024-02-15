@@ -519,7 +519,7 @@ class Fretboard(object):
     def draw_title(self):
         if self.title is not None:
             x = self.layout.width / 2 + self.style.drawing.spacing
-            y = self.layout.y - self.style.drawing.spacing
+            y = self.style.drawing.spacing
             self.drawing.add(
                 self.drawing.text(
                     self.title,
@@ -527,7 +527,7 @@ class Fretboard(object):
                     font_family=self.style.drawing.font_family,
                     font_size=self.style.drawing.font_size,
                     font_weight="bold",
-                    fill=self.style.drawing.font_color,
+                    fill=self.style.title.font_color,
                     text_anchor="middle",
                     alignment_baseline="central",
                 )
