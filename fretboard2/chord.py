@@ -60,11 +60,20 @@ class Chord(object):
         raise NotImplementedError
 
     def get_fret_range(self):
+        # we normally show 5 frets in a diagram  for consistency
+        # higher up the neck it might be nice to  have an extra fret before
+        # the first fingered position, if possible
         fretted_positions = list(
             filter(lambda pos: isinstance(pos, int), self.positions)
         )
-        if max(fretted_positions) < 5:
+        fretted_positions = [p for p in self.positions if isinstance(p, int) and p > 0]
+
+        minfret = min(fretted_positions)
+        maxfret = max(fretted_positions)
+        if maxfret < 5:
             first_fret = 0
+        elif (maxfret - minfret) <= 4:
+            first_fret = minfret - 1
         else:
             first_fret = min(filter(lambda pos: pos != 0, fretted_positions))
         return (first_fret, first_fret + 4)
@@ -121,9 +130,11 @@ class Chord(object):
                 self.fretboard.add_string_label(
                     string=string,
                     label="X" if is_muted else "O",
-                    font_color=self.style.string.muted_font_color
-                    if is_muted
-                    else self.style.string.open_font_color,
+                    font_color=(
+                        self.style.string.muted_font_color
+                        if is_muted
+                        else self.style.string.open_font_color
+                    ),
                 )
             elif fret is not None and fret != self.barre:
                 # Add the fret marker
