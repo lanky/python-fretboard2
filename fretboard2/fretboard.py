@@ -216,10 +216,17 @@ class Fretboard(object):
             )
 
         for index, string in enumerate(self.strings):
+            # do we want all our strings the same thickness
+            if self.style.string.equal_weight:
+                string_width = self.style.string.size
+            # otherwise (old default) they get thinner from L->R
+            # or from B->T in landscape orientation
+            else:
+                string_width = self.style.string.size - (
+                    (self.style.string.size / (len(self.strings) * 1.5)) * index
+                )
+
             # Offset the first and last strings, so they're not drawn outside the edge of the nut.
-            string_width = self.style.string.size - (
-                (self.style.string.size / (len(self.strings) * 1.5)) * index
-            )
             offset = 0
             str_index = self.get_layout_string_index(index)
 
@@ -229,7 +236,6 @@ class Fretboard(object):
                 offset -= string_width / 2.0
 
             if self.style.drawing.orientation == "portrait":
-
                 # horizontal position of str and its label
                 label_x = (
                     self.layout.x + (self.layout.string_space * str_index) + offset
