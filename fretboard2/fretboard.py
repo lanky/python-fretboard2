@@ -360,17 +360,18 @@ class Fretboard(object):
                     - (self.style.drawing.font_size * 0.75)
                 )
                 y = (
-                    self.layout.height
-                    + self.style.drawing.spacing
-                    + self.style.drawing.font_size * 1.0
+                    self.layout.y
+                    - self.style.drawing.spacing
+                    + self.style.drawing.font_size / 2
                 )
 
             self.drawing.add(
                 self.drawing.text(
-                    "{0}fr".format(self.frets[0]),
+                    f"{self.frets[0]}",
                     insert=(x, y),
-                    font_family=self.style.drawing.font_family,
-                    font_size=self.style.drawing.font_size,
+                    font_family=self.style.fret.label.get("font_family")
+                    or self.style.drawing.font_family,
+                    font_size=self.style.fret.label.font_size,
                     font_style="italic",
                     font_weight="bold",
                     fill=self.style.drawing.font_color,
