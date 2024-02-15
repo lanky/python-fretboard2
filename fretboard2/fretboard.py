@@ -565,7 +565,7 @@ class Fretboard(object):
                     fill=self.style.title.font_color,
                     text_anchor="middle",
                     alignment_baseline="central",
-                    dominant_baseline="middle",
+                    dominant_baseline="hanging",
                 )
             )
 
