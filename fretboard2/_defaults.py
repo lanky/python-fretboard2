@@ -13,7 +13,7 @@ drawing:
   height: 400
   width: 300
   spacing: 30
-  label_all_frets: false
+  label_all_frets: true
 # colour and weight of the nut (fret zero)
 nut:
   color: darkslategray
@@ -29,7 +29,8 @@ fret:
 fret_label:
   width: 28
   font_style: italic
-  font_size: 80%
+  font_size: 14
+  font_color: blue
 # fretboard inlays
 inlays:
   color: darkslategray
@@ -38,15 +39,15 @@ inlays:
 string:
   color: darkslategray
   size: 3
-  muted_font_color:
-  open_font_color:
+  muted_font_color: green
+  open_font_color: red
   label_font_family: Verdana
-  label_font_size: 8
+  label_font_size: 14
   equal_weight: false
 # blobs/finger position markers
 marker:
   border_color: black
-  color: darkslategray
+  color: black
   font_color: white
   radius: 2
   stroke_width: 2
@@ -66,6 +67,6 @@ chord:
   string:
     muted_font_color: silver
     open_font_color: darkslategray
-    label_font_size: 8
+    label_font_size: 12
 """
 )
