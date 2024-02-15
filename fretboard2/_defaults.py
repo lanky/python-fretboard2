@@ -22,10 +22,14 @@ nut:
 fret:
   color: darkgray
   size: 2
+  label:
+    font_size: 80%
+    font_style: italic
 # fret numbers
 fret_label:
   width: 28
   font_style: italic
+  font_size: 80%
 # fretboard inlays
 inlays:
   color: darkslategray
@@ -36,15 +40,15 @@ string:
   size: 3
   muted_font_color:
   open_font_color:
-  label_font_family:
-  label_font_size:
+  label_font_family: Verdana
+  label_font_size: 8
   equal_weight: false
 # blobs/finger position markers
 marker:
   border_color: black
   color: darkslategray
   font_color: white
-  radius: 18
+  radius: 2
   stroke_width: 2
 # title, at top of diagram
 title:
@@ -62,5 +66,6 @@ chord:
   string:
     muted_font_color: silver
     open_font_color: darkslategray
+    label_font_size: 8
 """
 )
