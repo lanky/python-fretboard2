@@ -69,39 +69,92 @@ class Fretboard(object):
         )
 
     def calculate_layout(self):
+        """Figure out spacing on left, right, top etc.
+
+        Taking into account whether this is portrait or landscape.
+        Some of these variable names could do with being clearer
+
+        Uses the configurtion read in from your config.yml (or defaults)
+        Key vars/settings
+
+        drawing.spacing: default margin around fretboard
+        drawing.width:   width of entire image
+        drawing.height:  height of entire image
+        nut.size:        how wide the "zero fret" should be
+        title.font_size: size of font for title
+        string.label.font_size: size of font for string labels
+
+        The config includes settings for title fonts etc too, sizes are taken
+        into consideration
+
+        Calculates (as self.layout.THING):
+            self.layout:
+              x:            x coordinate of fretboard (measured from left)
+              y:            y coord of fretboard (measured from top)
+              width:        width of fretboard
+              height:       height of fretboard
+              string_space: spacing between strings
+              fret_space:   spacing between frets
+              marker_size:  size (diameter/stroke size) for markers and barres
+        """
+        # common calculations for both portrait and landscape layouts
+        # both orientations have the title at the top, if there is one
+        self.layout.y = self.style.drawing.spacing
+
+        # if there is a title, it needs some extra space
+        if self.title:
+            self.layout.y += self.style.drawing.spacing + self.style.title.font_size
+
+        # we always have at least the default margin on the left
+        self.layout.x = self.style.drawing.spacing
+
+        # now cope with portrait and landscape differences
+        # portrait:
+        # string labels & title on top
+        # inlays on left, fret numbers on right
         if self.style.drawing.orientation == "portrait":
-            neck_width = self.style.drawing.width - (self.style.drawing.spacing * 2.25)
-            neck_length = self.style.drawing.height - (self.style.drawing.spacing * 2)
+            # fret length, wdith from str[0]->[-1]
+            # ALWAYS leave space on the right for fret labels
+            self.layout.width = self.style.drawing.width - (
+                self.layout.x + self.style.drawing.spacing
+            )
+            if self.frets[0] > 0:
+                self.layout.width -= self.style.drawing.spacing
 
-            layout_width = neck_width
-            layout_height = neck_length
-            layout_x = self.style.drawing.spacing
-            layout_y = self.style.drawing.spacing * 1.5
+            # length of strings, from top to bottom of grid
+            self.layout.height = self.style.drawing.height - (
+                self.layout.y + self.style.drawing.spacing
+            )
+
+            self.layout.string_space = self.layout.width / (len(self.strings) - 1)
+            self.layout.fret_space = (self.layout.height - self.style.nut.size * 2) / (
+                len(self.frets) - 1
+            )
+
+        # landscape:
+        # title and fret numbers (if shown) on top
+        # string labels on left
+        # inlays on bottom
         else:
-            neck_width = self.style.drawing.height - (self.style.drawing.spacing * 2.25)
-            neck_length = self.style.drawing.width - (self.style.drawing.spacing * 2)
+            # if you still have your drawing width < height, this will appear quite sqaushed.
+            self.layout.width = self.style.drawing.height - (
+                self.style.drawing.spacing * 2.25
+            )
 
-            layout_width = neck_length
-            layout_height = neck_width
-            layout_x = self.style.drawing.spacing * 1.5
-            layout_y = self.style.drawing.spacing
+            self.layout.height = self.style.drawing.width - (
+                self.style.drawing.spacing * 2
+            )
 
-        # Bounding box of our fretboard
-        self.layout.update(
-            {
-                "x": layout_x,
-                "y": layout_y,
-                "width": layout_width,
-                "height": layout_height,
-            }
-        )
+            self.layout.x = (
+                self.style.drawing.spacing + self.style.string.label_font_size
+            )
 
-        # Spacing between the strings
-        self.layout["string_space"] = neck_width / (len(self.strings) - 1)
+            self.layout.string_space = self.layout.height / (len(self.strings) - 1)
+            self.layout.fret_space = self.layout.width / (len(self.frets) - 1)
 
-        # Spacing between the frets, with room at the top and bottom for the nut
-        self.layout["fret_space"] = (neck_length - self.style.nut.size * 2) / (
-            len(self.frets) - 1
+        # radius for markers and barres - no more than 60% of the width of a fret
+        self.layout.radius = (
+            min([self.layout.fret_space, self.layout.string_space]) * 0.3
         )
 
     def get_layout_string_index(self, string_index):
