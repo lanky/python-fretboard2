@@ -15,7 +15,15 @@ from .utils import dict_merge
 class Fretboard(object):
     default_style = DEFAULTS
 
-    def __init__(self, strings=None, frets=(0, 5), inlays=None, title=None, style=None):
+    def __init__(
+        self,
+        strings=None,
+        frets=(0, 5),
+        inlays=None,
+        title=None,
+        style=None,
+        label_all_frets=False,
+    ):
         self.frets = list(range(max(frets[0] - 1, 0), frets[1] + 1))
         self.strings = [
             attrdict.AttrDict(
@@ -116,10 +124,8 @@ class Fretboard(object):
             # fret length, wdith from str[0]->[-1]
             # ALWAYS leave space on the right for fret labels
             self.layout.width = self.style.drawing.width - (
-                self.layout.x + self.style.drawing.spacing
+                self.layout.x + self.style.drawing.spacing + self.style.fret_label.width
             )
-            if self.frets[0] > 0:
-                self.layout.width -= self.style.drawing.spacing
 
             # length of strings, from top to bottom of grid
             self.layout.height = self.style.drawing.height - (
@@ -142,12 +148,14 @@ class Fretboard(object):
             )
 
             self.layout.height = self.style.drawing.width - (
-                self.style.drawing.spacing * 2
+                self.style.drawing.spacing * 2 + self.style.fret_label.width
             )
 
             self.layout.x = (
                 self.style.drawing.spacing + self.style.string.label_font_size
             )
+
+            self.layout.y += self.style.fret_label.width
 
             self.layout.string_space = self.layout.height / (len(self.strings) - 1)
             self.layout.fret_space = self.layout.width / (len(self.frets) - 1)
@@ -350,41 +358,58 @@ class Fretboard(object):
     def draw_fret_label(self):
         if self.frets[0] > 0:
             if self.style.drawing.orientation == "portrait":
-                x = (
-                    self.layout.width
-                    + self.style.drawing.spacing
-                    + self.style.inlays.radius
-                )
-                y = (
-                    self.layout.y
-                    + self.style.nut.size
-                    + (self.style.drawing.font_size * 0.2)
+                # in portrait, x stays constant
+                px = sum(
+                    (
+                        self.layout.x,
+                        self.layout.width,
+                        self.layout.radius,
+                        self.style.marker.stroke_width,
+                        self.style.fret_label.width / 2,
+                    )
                 )
             else:
-                x = (
-                    self.layout.x
-                    + self.style.nut.size
-                    - (self.style.drawing.font_size * 0.75)
-                )
-                y = (
+                # in landscape, y stays constant
+                ly = (
                     self.layout.y
-                    - self.style.drawing.spacing
-                    + self.style.drawing.font_size / 2
+                    - self.layout.radius
+                    - self.style.marker.stroke_width
+                    - self.style.fret_label.width / 2
                 )
 
-            self.drawing.add(
-                self.drawing.text(
-                    f"{self.frets[0]}",
-                    insert=(x, y),
-                    font_family=self.style.fret.label.get("font_family")
-                    or self.style.drawing.font_family,
-                    font_size=self.style.fret.label.font_size,
-                    font_style="italic",
-                    font_weight="bold",
-                    fill=self.style.drawing.font_color,
-                    text_anchor="start",
+            fretlabels = []
+            for i, f in enumerate(self.frets):
+                offset = sum(
+                    (
+                        self.style.nut.size,
+                        self.layout.fret_space / 2,
+                        self.layout.fret_space * i,
+                    )
                 )
-            )
+                if self.style.drawing.orientation == "portrait":
+                    fretlabels.append((px, self.layout.y + offset, str(f)))
+                else:
+                    fretlabels.append((self.layout.x + offset, ly, str(f)))
+
+            # if we aren't in first (open) position
+            if not self.style.drawing.label_all_frets:
+                # ignore all but the first label
+                fretlabels = [fretlabels[0]]
+
+            for x, y, label in fretlabels:
+                self.drawing.add(
+                    self.drawing.text(
+                        label,
+                        insert=(x, y),
+                        font_family=self.style.drawing.font_family,
+                        font_size=self.style.fret.label.font_size
+                        or self.style.drawing.font_size,
+                        font_style="italic",
+                        font_weight="bold",
+                        fill=self.style.drawing.font_color,
+                        text_anchor="middle",
+                    )
+                )
 
     def draw_markers(self):
         for marker in self.markers:
