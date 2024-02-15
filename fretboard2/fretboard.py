@@ -261,7 +261,8 @@ class Fretboard(object):
                         string.label,
                         insert=(label_x, label_y),
                         font_family=self.style.drawing.font_family,
-                        font_size=self.style.drawing.font_size,
+                        font_size=self.style.string.label_font_size
+                        or self.style.drawing.font_size,
                         font_weight="bold",
                         fill=string.font_color or self.style.marker.color,
                         text_anchor="middle",
@@ -433,6 +434,7 @@ class Fretboard(object):
                     fill=self.style.marker.font_color,
                     text_anchor="middle",
                     alignment_baseline="central",
+                    dominant_baseline="middle",
                 )
             )
 
@@ -513,6 +515,7 @@ class Fretboard(object):
                     fill=self.style.marker.font_color,
                     text_anchor="middle",
                     alignment_baseline="central",
+                    dominant_baseline="middle",
                 )
             )
 
@@ -530,6 +533,7 @@ class Fretboard(object):
                     fill=self.style.title.font_color,
                     text_anchor="middle",
                     alignment_baseline="central",
+                    dominant_baseline="middle",
                 )
             )
 
