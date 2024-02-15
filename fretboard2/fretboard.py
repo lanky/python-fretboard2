@@ -391,7 +391,7 @@ class Fretboard(object):
         marker_string = self.get_layout_string_index(marker.string)
 
         if self.style.drawing.orientation == "portrait":
-            x = self.style.drawing.spacing + (self.layout.string_space * marker_string)
+            x = self.layout.x + (self.layout.string_space * marker_string)
             y = sum(
                 (
                     self.layout.y,
@@ -409,12 +409,12 @@ class Fretboard(object):
                     - (self.layout.fret_space / 2),
                 )
             )
-            y = self.style.drawing.spacing + (self.layout.string_space * marker_string)
+            y = self.layout.y + (self.layout.string_space * marker_string)
 
         self.drawing.add(
             self.drawing.circle(
                 center=(x, y),
-                r=self.style.marker.radius,
+                r=self.layout.radius,
                 fill=marker.color or self.style.marker.color,
                 stroke=self.style.marker.border_color,
                 stroke_width=self.style.marker.stroke_width,
@@ -488,8 +488,7 @@ class Fretboard(object):
                 end=end,
                 stroke=self.style.marker.border_color,
                 stroke_linecap="round",
-                stroke_width=(self.style.marker.radius * 2)
-                + (self.style.marker.stroke_width * 2),
+                stroke_width=self.layout.radius * 2,
             )
         )
 
