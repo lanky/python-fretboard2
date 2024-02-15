@@ -378,7 +378,7 @@ class Fretboard(object):
                 )
 
             fretlabels = []
-            for i, f in enumerate(self.frets):
+            for i, f in enumerate(self.frets[:-1]):
                 offset = sum(
                     (
                         self.style.nut.size,
