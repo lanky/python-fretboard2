@@ -20,3 +20,18 @@ def dict_merge(dct, merge_dct):
         else:
             dct[k] = merge_dct[k]
     return dct
+
+
+def convert_int(item):
+    """
+    Used to coerce an item from an iterable to int, but to gracefully
+    handle it already being so.
+    Used to convert provided fret positions to integers (or None)
+    """
+    if isinstance(item, int):
+        return item
+    if isinstance(item, str):
+        if item.isdigit():
+            return int(item)
+        else:
+            return None

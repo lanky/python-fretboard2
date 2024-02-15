@@ -8,7 +8,7 @@ from . import fretboard
 # from .config import settings
 from ._defaults import CHORD, DEFAULTS
 from .compat import StringIO
-from .utils import dict_merge
+from .utils import convert_int, dict_merge
 
 
 class Chord(object):
@@ -34,14 +34,25 @@ class Chord(object):
     ):
         if positions is None:
             positions = []
-        elif "-" in positions:
-            # use - to separate numbers when frets go above 9, e.g., x-x-0-10-10-10
-            positions = positions.split("-")
-        else:
-            positions = list(positions)
-        self.positions = list(map(lambda p: int(p) if p.isdigit() else None, positions))
+        elif isinstance(positions, str):
+            if "-" in positions:
+                # use - to separate numbers when frets go above 9, e.g., x-x-0-10-10-10
+                positions = positions.split("-")
+            else:
+                positions = list(positions)
+        # oops,. did we put in something like 5333 without quoting?
+        if isinstance(positions, int):
+            positions = list(str(positions))
 
-        self.fingers = list(fingers) if fingers else []
+        try:
+            self.positions = [convert_int(p) for p in positions]
+        except Exception:
+            print(positions)
+
+        try:
+            self.fingers = list(fingers) if fingers else []
+        except TypeError:
+            self.fingers = list(str(fingers))
 
         self.barre = barre
 
@@ -98,7 +109,9 @@ class Chord(object):
         else:
             # Otherwise check for a barred fret
             for index, finger in enumerate(self.fingers):
-                if finger.isdigit() and self.fingers.count(finger) > 1:
+                if (isinstance(finger, int) or finger.isdigit()) and self.fingers.count(
+                    finger
+                ) > 1:
                     self.barre = self.positions[index]
                     self.fretboard.add_barre(
                         fret=self.barre,
